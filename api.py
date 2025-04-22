@@ -62,14 +62,14 @@ def recommend_workout(input_data: WorkoutRecommendationInput):
             input_data.Age,
             gender_encoded,
             intensity_encoded,
-            input_data.Workout_Days,  # Add Workout Days here
+            input_data.Workout_Days,  
             input_data.BMI,
             input_data.Duration_Per_Day
         ]
 
         prediction = recommender_model.predict([features])[0]
 
-        # Decode the prediction if it's encoded
+        
         category_decoder = {0: 'High Effort', 1: 'Endurance', 2: 'Flexibility'}
         predicted_category = category_decoder.get(prediction, str(prediction))
 
