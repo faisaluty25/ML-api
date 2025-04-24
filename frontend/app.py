@@ -78,7 +78,7 @@ if page == "🏋️ Calories Calculator":
                 "Workout_Days": workout_days,
                 "Workout_Type": workout_type
             }
-            res = requests.post(f"{API_BASE}/calculate-calories", json=payload)
+            res = requests.post(f"{API_BASE}https://ml-api-o1c4.onrender.com/calculate-calories", json=payload)
             if res.status_code == 200:
                 result = res.json()
                 st.success("✅ Calculation Complete!")
@@ -112,7 +112,7 @@ elif page == "🏋️ Workout Recommendation":
                 "Workout_Intensity": workout_intensity,
                 "Workout_Days": workout_days
             }
-            res = requests.post(f"{API_BASE}/recommend-workout", json=payload)
+            res = requests.post(f"{API_BASE}https://ml-api-o1c4.onrender.com/recommend-workout", json=payload)
             # if res.status_code == 200:
             #     category = res.json()["Recommended_Workout_Category"]
             #     st.success(f"🎯 Recommended Workout Category: **{category}**")
@@ -158,7 +158,7 @@ elif page == "🏋️ Custom Workout Plan":
                 "mode": mode,
                 "preferences": preferences
             }
-            res = requests.post(f"{API_BASE}/generate-plan", json=payload)
+            res = requests.post(f"{API_BASE}https://ml-api-o1c4.onrender.com/generate-plan", json=payload)
             if res.status_code == 200:
                 response = res.json()
 
