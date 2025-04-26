@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import joblib
 from generate_workout_plan import generate_custom_plan
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -57,6 +58,46 @@ def calculate_calories(data: CaloriesInput):
         return {"error": f"An error occurred: {e}"}
 
 
+# # --- WORKOUT RECOMMENDER ENDPOINT ---
+# class WorkoutRecommendationInput(BaseModel):
+#     Age: int
+#     Gender: str
+#     BMI: float
+#     Duration_Per_Day: float
+#     Workout_Intensity: str
+#     Workout_Days: int 
+
+# @app.post("/recommend-workout")
+# def recommend_workout(input_data: WorkoutRecommendationInput):
+#     try:
+#         # Encode categorical values
+#         gender_encoded = label_encoders['Gender'].transform([input_data.Gender])[0]
+#         intensity_encoded = label_encoders['Workout Intensity'].transform([input_data.Workout_Intensity])[0]
+
+#         # Construct feature vector (including the missing Workout Days)
+#         features = [
+#             input_data.Age,
+#             gender_encoded,
+#             intensity_encoded,
+#             input_data.Workout_Days,  
+#             input_data.BMI,
+#             input_data.Duration_Per_Day
+#         ]
+
+#         prediction = recommender_model.predict([features])[0]
+
+        
+#         category_decoder = {0: 'High Effort', 1: 'Endurance', 2: 'Flexibility'}
+#         predicted_category = category_decoder.get(prediction, str(prediction))
+
+#         return {"Recommended_Workout_Category": predicted_category}
+
+#     except ValueError as ve:
+#         raise HTTPException(status_code=400, detail=f"Encoding Error: {str(ve)}")
+
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+
 # --- WORKOUT RECOMMENDER ENDPOINT ---
 class WorkoutRecommendationInput(BaseModel):
     Age: int
@@ -64,7 +105,7 @@ class WorkoutRecommendationInput(BaseModel):
     BMI: float
     Duration_Per_Day: float
     Workout_Intensity: str
-    Workout_Days: int 
+    Workout_Days: int
 
 @app.post("/recommend-workout")
 def recommend_workout(input_data: WorkoutRecommendationInput):
@@ -84,19 +125,17 @@ def recommend_workout(input_data: WorkoutRecommendationInput):
         ]
 
         prediction = recommender_model.predict([features])[0]
-
-        
         category_decoder = {0: 'High Effort', 1: 'Endurance', 2: 'Flexibility'}
         predicted_category = category_decoder.get(prediction, str(prediction))
 
-        return {"Recommended_Workout_Category": predicted_category}
+        # Return JSON response explicitly
+        return JSONResponse(content={"Recommended_Workout_Category": predicted_category})
 
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=f"Encoding Error: {str(ve)}")
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
-
 
 
 # --- CUSTOM WORKOUT PLAN ENDPOINT ---

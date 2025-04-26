@@ -324,26 +324,42 @@ elif page == "🏋️ Workout Recommendation":
                 
             # else:
             #     st.error(res.json()["detail"])
+            # if res.status_code == 200:
+            #     category = res.json()["Recommended_Workout_Category"]
+            #     st.success(f"🎯 Recommended Workout Category: {category}")
+
+            #     # Add detailed recommendation
+            #     suggestions = {
+            #         "Endurance": ["Cardio", "Running", "Cycling"],
+            #         "High Effort": ["HIIT", "Strength"],
+            #         "Flexibility": ["Yoga"]
+            #     }
+
+            #     st.subheader(f"{category} Training is a Good Fit for You! 💪")
+            #     st.markdown(f"Based on your data, *Fit Vision* recommends focusing on *{category.upper()}-BASED* exercises.")
+
+            #     st.markdown("### Here are some great starting points:")
+            #     for item in suggestions.get(category, []):
+            #         st.markdown(f"- {item}")
+
+            # else:
+            #     st.error(res.json()["detail"])
+                
+            #     res = requests.post(f"{API_BASE}/recommend-workout", json=payload)
+
+            # Check the response status and content
             if res.status_code == 200:
-                category = res.json()["Recommended_Workout_Category"]
-                st.success(f"🎯 Recommended Workout Category: {category}")
-
-                # Add detailed recommendation
-                suggestions = {
-                    "Endurance": ["Cardio", "Running", "Cycling"],
-                    "High Effort": ["HIIT", "Strength"],
-                    "Flexibility": ["Yoga"]
-                }
-
-                st.subheader(f"{category} Training is a Good Fit for You! 💪")
-                st.markdown(f"Based on your data, *Fit Vision* recommends focusing on *{category.upper()}-BASED* exercises.")
-
-                st.markdown("### Here are some great starting points:")
-                for item in suggestions.get(category, []):
-                    st.markdown(f"- {item}")
-
+                try:
+                    response_data = res.json()
+                    category = response_data.get("Recommended_Workout_Category")
+                    if category:
+                        st.success(f"🎯 Recommended Workout Category: {category}")
+                    else:
+                        st.error("❌ Failed to get a valid category from the response.")
+                except ValueError as e:
+                    st.error(f"❌ Failed to decode JSON. Response content: {res.text}")
             else:
-                st.error(res.json()["detail"])
+                st.error(f"❌ Error: {res.status_code}, Response content: {res.text}")
 
 # --- 3. Custom Workout Plan ---
 elif page == "🏋️ Custom Workout Plan":
