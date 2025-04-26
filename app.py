@@ -268,21 +268,15 @@ if page == "🏋️ Calories Calculator":
                 "Workout_Days": workout_days,
                 "Workout_Type": workout_type
             }
-            
-            # Debug: Print payload to verify it
-            st.write(payload)
-
-            try:
-                response = requests.post(f"{API_BASE}/calculate-calories", json=payload)
-                if response.status_code == 200:
-                    result = response.json()
-                    st.success(f"🔥 Total Calories Burned: {result['Total_Calories']} kcal")
-                    st.info(f"📈 BMI: {result['BMI']}")
-                    st.info(f"🔥 Calories per Minute: {result['Calories_Per_Minute']}")
-                else:
-                    st.error("❌ Failed to calculate. Please check your inputs.")
-            except Exception as e:
-                st.error(f"❌ Error: {e}")
+            res = requests.post(f"{API_BASE}/calculate-calories", json=payload)
+            if res.status_code == 200:
+                result = res.json()
+                st.success("✅ Calculation Complete!")
+                st.metric("Total Calories Burned", f"{result['Total_Calories']} kcal")
+                st.metric("Calories per Minute", f"{result['Calories_Per_Minute']} kcal/min")
+                st.metric("BMI", result["BMI"])
+            else:
+                st.error("Failed to calculate. Please check your inputs.")
 
 # --- 2. Workout Recommendation ---
 elif page == "🏋️ Workout Recommendation":
@@ -308,13 +302,72 @@ elif page == "🏋️ Workout Recommendation":
                 "Workout_Intensity": workout_intensity,
                 "Workout_Days": workout_days
             }
+            res = requests.post(f"{API_BASE}/recommend-workout", json=payload)
+            # if res.status_code == 200:
+            #     category = res.json()["Recommended_Workout_Category"]
+            #     st.success(f"🎯 Recommended Workout Category: **{category}**")
+                
+            # else:
+            #     st.error(res.json()["detail"])
+            if res.status_code == 200:
+                category = res.json()["Recommended_Workout_Category"]
+                st.success(f"🎯 Recommended Workout Category: {category}")
 
-            try:
-                response = requests.post(f"{API_BASE}/recommend-workout", json=payload)
-                if response.status_code == 200:
-                    category = response.json()["Recommended_Workout_Category"]
-                    st.success(f"🎯 Recommended Workout Category: **{category}**")
-                else:
-                    st.error(f"❌ Error: {response.json()['detail']}")
-            except Exception as e:
-                st.error(f"❌ Error: {e}")
+                # Add detailed recommendation
+                suggestions = {
+                    "Endurance": ["Cardio", "Running", "Cycling"],
+                    "High Effort": ["HIIT", "Strength"],
+                    "Flexibility": ["Yoga"]
+                }
+
+                st.subheader(f"{category} Training is a Good Fit for You! 💪")
+                st.markdown(f"Based on your data, *Fit Vision* recommends focusing on *{category.upper()}-BASED* exercises.")
+
+                st.markdown("### Here are some great starting points:")
+                for item in suggestions.get(category, []):
+                    st.markdown(f"- {item}")
+
+            else:
+                st.error(res.json()["detail"])
+
+# --- 3. Custom Workout Plan ---
+elif page == "🏋️ Custom Workout Plan":
+    st.subheader("📋 Custom Weekly Workout Plan")
+    with st.form("plan_form"):
+        workout_days = st.slider("Workout Days per Week", 1, 7, 3)
+        mode = st.selectbox("Plan Mode", ["full_body", "muscle", "body_part"])
+        preferences = st.multiselect("Muscle or Body Part Preferences (optional)", [
+            "chest", "back", "shoulders", "waist", "upper arms", "lower arms", 
+            "upper legs", "lower legs", "cardio", "neck"
+        ])
+
+        submitted = st.form_submit_button("Generate Plan")
+        if submitted:
+            payload = {
+                "workout_days": workout_days,
+                "mode": mode,
+                "preferences": preferences
+            }
+            res = requests.post(f"{API_BASE}/generate-plan", json=payload)
+            if res.status_code == 200:
+                response = res.json()
+
+                title = response.get("title", "Your Custom Plan")
+                st.success(f"💪 Here's your custom weekly workout plan: **{title}**")
+
+                full_plan = response.get("days", {})
+                for day, exercises in full_plan.items():
+                    st.markdown(f"### 📅 {day}")
+                    if not exercises:
+                        st.markdown("- Rest day 💤")
+                    else:
+                        for ex in exercises:
+                            st.markdown(
+                                f"**{ex['name'].title()}**  \n"
+                                f"• **Body Part:** {ex['bodyPart']}  \n"
+                                f"• **Target:** {ex['target']}  \n"
+                                f"• **Equipment:** {ex['equipment']}  \n"
+                                f"![gif]({ex['gifUrl']})"
+                            )
+            else:
+                st.error("❌ Failed to generate plan. Try again.")
