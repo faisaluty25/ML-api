@@ -10,7 +10,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (for testing — can restrict later)
+    allow_origins=["https://ml-api-o1c4.onrender.com"],  # Allow all origins (for testing — can restrict later)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
