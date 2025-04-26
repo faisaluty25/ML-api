@@ -67,6 +67,7 @@ if page == "🏋️ Calories Calculator":
             workout_type = st.selectbox("Workout Type", ["None", "Yoga", "Dancing", "Cardio", "HIIT"])
 
         submitted = st.form_submit_button("Calculate Calories")
+
         if submitted:
             payload = {
                 "Age": age,
@@ -78,15 +79,19 @@ if page == "🏋️ Calories Calculator":
                 "Workout_Days": workout_days,
                 "Workout_Type": workout_type
             }
-            res = requests.post(f"{API_BASE}/calculate-calories", json=payload)
-            if res.status_code == 200:
-                result = res.json()
-                st.success("✅ Calculation Complete!")
-                st.metric("Total Calories Burned", f"{result['Total_Calories']} kcal")
-                st.metric("Calories per Minute", f"{result['Calories_Per_Minute']} kcal/min")
-                st.metric("BMI", result["BMI"])
-            else:
-                st.error("Failed to calculate. Please check your inputs.")
+
+            try:
+                response = requests.post(f"{API_BASE}/calculate-calories", json=payload)
+                if response.status_code == 200:
+                    result = response.json()
+                    st.success(f"🔥 Total Calories Burned: {result['Total_Calories']} kcal")
+                    st.info(f"📈 BMI: {result['BMI']}")
+                    st.info(f"🔥 Calories per Minute: {result['Calories_Per_Minute']}")
+                else:
+                    st.error("❌ Failed to calculate. Please check your inputs.")
+            except Exception as e:
+                st.error(f"❌ Error: {e}")
+
 
 # --- 2. Workout Recommendation ---
 elif page == "🏋️ Workout Recommendation":
