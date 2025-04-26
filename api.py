@@ -10,6 +10,7 @@ recommender_model = joblib.load("recommendation_model.joblib")
 label_encoders = joblib.load("label_encoders.joblib")
 feature_names = ['Age', 'Gender', 'BMI', 'Duration Per Day', 'Workout Intensity']
 
+
 # --- CALORIES CALCULATION ENDPOINT ---
 class CaloriesInput(BaseModel):
     Age: int
@@ -23,23 +24,27 @@ class CaloriesInput(BaseModel):
 
 @app.post("/calculate-calories")
 def calculate_calories(data: CaloriesInput):
-    workout_factors = {
-        "None": 0,
-        "Yoga": 1,
-        "Dancing": 2,
-        "Cardio": 3,
-        "HIIT": 4
-    }
-    workout_factor = workout_factors.get(data.Workout_Type, 0)
-    calories_per_min = (data.Heart_Rate * data.Weight_kg * 0.0007) + (data.Age * 0.01) + workout_factor
-    total_calories = calories_per_min * data.Workout_Duration_mins
-    bmi = data.Weight_kg / ((data.Height_cm / 100) ** 2)
+    try:
+        workout_factors = {
+            "None": 0,
+            "Yoga": 1,
+            "Dancing": 2,
+            "Cardio": 3,
+            "HIIT": 4
+        }
+        workout_factor = workout_factors.get(data.Workout_Type, 0)
+        calories_per_min = (data.Heart_Rate * data.Weight_kg * 0.0007) + (data.Age * 0.01) + workout_factor
+        total_calories = calories_per_min * data.Workout_Duration_mins
+        bmi = data.Weight_kg / ((data.Height_cm / 100) ** 2)
 
-    return {
-        "Total_Calories": round(total_calories, 2),
-        "Calories_Per_Minute": round(calories_per_min, 2),
-        "BMI": round(bmi, 2)
-    }
+        return {
+            "Total_Calories": round(total_calories, 2),
+            "Calories_Per_Minute": round(calories_per_min, 2),
+            "BMI": round(bmi, 2)
+        }
+    except Exception as e:
+        return {"error": f"An error occurred: {e}"}
+
 
 # --- WORKOUT RECOMMENDER ENDPOINT ---
 class WorkoutRecommendationInput(BaseModel):
