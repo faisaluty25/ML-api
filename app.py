@@ -268,7 +268,22 @@ if page == "🏋️ Calories Calculator":
                 "Workout_Days": workout_days,
                 "Workout_Type": workout_type
             }
+            # res = requests.post(f"{API_BASE}/calculate-calories", json=payload)
+            # if res.status_code == 200:
+            #     result = res.json()
+            #     st.success("✅ Calculation Complete!")
+            #     st.metric("Total Calories Burned", f"{result['Total_Calories']} kcal")
+            #     st.metric("Calories per Minute", f"{result['Calories_Per_Minute']} kcal/min")
+            #     st.metric("BMI", result["BMI"])
+            # else:
+            #     st.error("Failed to calculate. Please check your inputs.")
+            
             res = requests.post(f"{API_BASE}/calculate-calories", json=payload)
+
+            # ADD THESE LINES BELOW to see what’s going wrong:
+            st.write("Status Code:", res.status_code)
+            st.write("Response Text:", res.text)
+
             if res.status_code == 200:
                 result = res.json()
                 st.success("✅ Calculation Complete!")
