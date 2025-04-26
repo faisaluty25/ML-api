@@ -2,8 +2,19 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import joblib
 from generate_workout_plan import generate_custom_plan
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (for testing — can restrict later)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Load the model and encoders
 recommender_model = joblib.load("recommendation_model.joblib")
