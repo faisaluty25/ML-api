@@ -70,13 +70,13 @@ if page == "🏋️ Calories Calculator":
 
         if submitted:
             payload = {
-                "Age": age,
+                "Age": int(age),
                 "Gender": gender,
-                "Height_cm": height,
-                "Weight_kg": weight,
-                "Heart_Rate": heart_rate,
-                "Workout_Duration_mins": workout_duration,
-                "Workout_Days": workout_days,
+                "Height_cm": float(height),
+                "Weight_kg": float(weight),
+                "Heart_Rate": float(heart_rate),
+                "Workout_Duration_mins": int(workout_duration),
+                "Workout_Days": int(workout_days),
                 "Workout_Type": workout_type
             }
 
